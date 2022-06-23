@@ -33,6 +33,9 @@ interface PlantDao {
     @Query("SELECT * FROM plants WHERE growZoneNumber = :growZoneNumber ORDER BY name")
     fun getPlantsWithGrowZoneNumber(growZoneNumber: Int): Flow<List<Plant>>
 
+    @Query("SELECT * FROM plants WHERE name like '%' || :name || '%' ORDER BY name")
+    fun getPlantsByName(name: String): Flow<List<Plant>>
+
     @Query("SELECT * FROM plants WHERE id = :plantId")
     fun getPlant(plantId: String): Flow<Plant>
 
