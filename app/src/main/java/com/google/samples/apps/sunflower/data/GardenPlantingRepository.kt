@@ -38,6 +38,8 @@ class GardenPlantingRepository @Inject constructor(
 
     fun getPlantedGardens() = gardenPlantingDao.getPlantedGardens()
 
+    fun getPlantedGardensByName(name: String) = gardenPlantingDao.getPlantedGardensByName(name)
+
     companion object {
 
         // For Singleton instantiation
