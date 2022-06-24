@@ -46,4 +46,7 @@
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
+    <style name="PlantToolbarStyle" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="android:textColor">@color/sunflower_green_500</item>
+    </style>
 </resources>

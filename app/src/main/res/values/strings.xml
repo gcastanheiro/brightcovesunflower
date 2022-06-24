@@ -53,5 +53,6 @@
     <string name="plant_detail_image_content_description" translation_description="Content description for the header / hero image that is show at the top of the plant detail screen.">Image of plant</string>
     <string name="filter_by_name">Filter by name</string>
     <string name="text_to_search">Name or text to search</string>
+    <string name="menu_filter_by_name">Filter by name</string>
 
 </resources>
