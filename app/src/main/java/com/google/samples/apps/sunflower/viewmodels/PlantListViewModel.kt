@@ -16,17 +16,12 @@
 
 package com.google.samples.apps.sunflower.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.samples.apps.sunflower.PlantListFragment
 import com.google.samples.apps.sunflower.data.Plant
 import com.google.samples.apps.sunflower.data.PlantRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,15 +35,19 @@ class PlantListViewModel @Inject internal constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val growZone: MutableStateFlow<Int> = MutableStateFlow(
-        savedStateHandle.get(GROW_ZONE_SAVED_STATE_KEY) ?: NO_GROW_ZONE
-    )
+    // Encapsulate both filters in a single class; this way, we can listen to any change on either
+    // Implementation decision: only one filter is active at a time, when we apply one, we reset the other
+    private val filters: MutableStateFlow<Filter> = MutableStateFlow(
+        Filter(savedStateHandle.get(GROW_ZONE_SAVED_STATE_KEY) ?: NO_GROW_ZONE,
+            savedStateHandle.get(NAME_FILTER_SAVED_STATE_KEY) ?: ""))
 
-    val plants: LiveData<List<Plant>> = growZone.flatMapLatest { zone ->
-        if (zone == NO_GROW_ZONE) {
-            plantRepository.getPlants()
+    val plants: LiveData<List<Plant>> = filters.flatMapLatest { filter ->
+        if (filter.growZone != NO_GROW_ZONE) {
+            plantRepository.getPlantsWithGrowZoneNumber(filter.growZone)
+        } else if (filter.name.isNotEmpty()) {
+            plantRepository.getPlantsByName(filter.name)
         } else {
-            plantRepository.getPlantsWithGrowZoneNumber(zone)
+            plantRepository.getPlants()
         }
     }.asLiveData()
 
@@ -82,24 +81,36 @@ class PlantListViewModel @Inject internal constructor(
          *    }.launchIn(viewModelScope)
          */
         viewModelScope.launch {
-            growZone.collect { newGrowZone ->
-                savedStateHandle.set(GROW_ZONE_SAVED_STATE_KEY, newGrowZone)
+            filters.collect { newFilter ->
+                savedStateHandle.set(GROW_ZONE_SAVED_STATE_KEY, newFilter.growZone)
+                savedStateHandle.set(NAME_FILTER_SAVED_STATE_KEY, newFilter.name)
             }
         }
     }
 
     fun setGrowZoneNumber(num: Int) {
-        growZone.value = num
+        filters.value = Filter(num, "")
     }
 
     fun clearGrowZoneNumber() {
-        growZone.value = NO_GROW_ZONE
+        filters.value = Filter(NO_GROW_ZONE, "")
     }
 
-    fun isFiltered() = growZone.value != NO_GROW_ZONE
+    fun isFiltered() = filters.value.growZone != NO_GROW_ZONE
+
+    fun filterByName(name: String) {
+        filters.value = Filter(NO_GROW_ZONE, name)
+    }
 
     companion object {
         private const val NO_GROW_ZONE = -1
         private const val GROW_ZONE_SAVED_STATE_KEY = "GROW_ZONE_SAVED_STATE_KEY"
+        private const val NAME_FILTER_SAVED_STATE_KEY = "NAME_FILTER_SAVED_STATE_KEY"
     }
+
+    // encapsulate both filters in a single class; this way, we can listen to any change on either
+    class Filter(
+        val growZone: Int,
+        val name: String
+    )
 }

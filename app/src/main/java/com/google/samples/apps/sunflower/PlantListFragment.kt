@@ -17,16 +17,11 @@
 package com.google.samples.apps.sunflower
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.samples.apps.sunflower.adapters.PlantAdapter
-import com.google.samples.apps.sunflower.data.Plant
+import com.google.samples.apps.sunflower.compose.filteralertdialog.FilterByNameDialog
 import com.google.samples.apps.sunflower.databinding.FragmentPlantListBinding
 import com.google.samples.apps.sunflower.viewmodels.PlantListViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,6 +55,10 @@ class PlantListFragment : Fragment() {
         return when (item.itemId) {
             R.id.filter_zone -> {
                 updateData()
+                true
+            }
+            R.id.filter_name -> {
+                FilterByNameDialog(viewModel::filterByName).show(childFragmentManager, "name_filter")
                 true
             }
             else -> super.onOptionsItemSelected(item)
