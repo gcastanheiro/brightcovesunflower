@@ -19,21 +19,18 @@ package com.google.samples.apps.sunflower.compose.filteralertdialog
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.text.InputType
+import android.view.LayoutInflater
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import com.google.samples.apps.sunflower.R
 
 class FilterByNameDialog(val onApplyFilter: (name: String) -> Unit) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        // usually I prefer to create the entire layout in xml, but as I simply wanted an EditText, I opted by directly creating it here
-        val input = EditText(requireActivity())
-        input.hint = getString(R.string.text_to_search)
-        input.inputType = InputType.TYPE_CLASS_TEXT
+        val view = LayoutInflater.from(requireActivity()).inflate(R.layout.layout_filter_by_name, null)
         return AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.filter_by_name))
-            .setView(input)
-            .setPositiveButton(getString(android.R.string.ok)) { _,_ -> onApplyFilter(input.text.toString())}
+            .setView(view)
+            .setPositiveButton(getString(android.R.string.ok)) { _,_ -> onApplyFilter(view.findViewById<EditText>(R.id.edit_text).text.toString())}
             .create()
     }
 }
