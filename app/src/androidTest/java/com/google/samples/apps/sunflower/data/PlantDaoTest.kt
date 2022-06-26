@@ -35,8 +35,8 @@ class PlantDaoTest {
     private lateinit var database: AppDatabase
     private lateinit var plantDao: PlantDao
     private val plantA = Plant("1", "A", "", 1, 1, "")
-    private val plantB = Plant("2", "B", "", 1, 1, "")
-    private val plantC = Plant("3", "C", "", 2, 2, "")
+    private val plantB = Plant("2", "Bro", "", 1, 1, "")
+    private val plantC = Plant("3", "Cro", "", 2, 2, "")
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -73,6 +73,15 @@ class PlantDaoTest {
         // Ensure plant list is sorted by name
         assertThat(plantList[0], equalTo(plantA))
         assertThat(plantList[1], equalTo(plantB))
+    }
+
+    @Test fun testGetPlantsByName() = runBlocking {
+        val plantList = plantDao.getPlantsByName("a").first()
+        assertThat(plantList.size, equalTo(1))
+        assertThat(plantDao.getPlantsByName("ro").first().size, equalTo(2))
+
+        // Ensure we get the right plant (only one has an "a" in the name)
+        assertThat(plantList[0], equalTo(plantA))
     }
 
     @Test fun testGetPlant() = runBlocking {
