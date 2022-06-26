@@ -96,4 +96,17 @@ class GardenPlantingDaoTest {
         assertThat(plantAndGardenPlantings[0].gardenPlantings.size, equalTo(1))
         assertThat(plantAndGardenPlantings[0].gardenPlantings[0], equalTo(testGardenPlanting))
     }
+
+    @Test fun testGetPlantAndGardenPlantingsByName() = runBlocking {
+        val plantAndGardenPlantings = gardenPlantingDao.getPlantedGardensByName("A").first()
+        assertThat(plantAndGardenPlantings.size, equalTo(1))
+        assertThat(gardenPlantingDao.getPlantedGardensByName("B").first().size, equalTo(0))
+
+        /**
+         * Only the [testPlant] has been planted, and thus has an associated [GardenPlanting]
+         */
+        assertThat(plantAndGardenPlantings[0].plant, equalTo(testPlant))
+        assertThat(plantAndGardenPlantings[0].gardenPlantings.size, equalTo(1))
+        assertThat(plantAndGardenPlantings[0].gardenPlantings[0], equalTo(testGardenPlanting))
+    }
 }
